@@ -6,10 +6,15 @@ class Interpolator {
     this.options = options;
     this.reserved = [':','|']
     this.modifiers = [];
-    this.init();
+    this.registerBuiltInModifiers();
   }
 
-  delimiter() {
+  registerBuiltInModifiers() {
+    defaultModifiers.forEach(modifier => this.registerModifier(modifier.key, modifier.transform));
+    return this;
+  }
+
+  get delimiter() {
     return this.options.delimiter;
   }
 
@@ -34,17 +39,13 @@ class Interpolator {
     return this;
   }
 
-  init() {
-    defaultModifiers.forEach(modifier => this.registerModifier(modifier.key, modifier.transform));
-  }
-
   parseRules(str) {
     const regex = `${this.delimiterStart()}([^}]+)${this.delimiterEnd()}`;
     const execRegex = new RegExp(regex, 'gi');
     const matches = str.match(execRegex);
 
     // const parsableMatches = matches.map((match) => ({ key: removeDelimiter(match), replaceWith: match }));
-    return this.extractRules(matches);
+    return matches ? this.extractRules(matches) : [];
   }
 
   extractRules(matches) {
@@ -108,17 +109,15 @@ class Interpolator {
 
   parse(str = '', data = {}) {
     const rules = this.parseRules(str);
-    return this.parseFromRules(str, data, rules);
+    if (rules && rules.length > 0) {
+      return this.parseFromRules(str, data, rules);
+    }
+
+    return str;
   }
 
   parseFromRules(str, data, rules) {
-    let mutatedString = str;
-
-    rules.forEach((rule) => {
-      mutatedString = this.applyRule(mutatedString, rule, data);
-    });
-
-    return mutatedString;
+    return rules.reduce((opts, rule) => this.applyRule(opts.str, rule, opts.data), { str, data });
   }
 
   applyRule(str, rule, data) {

@@ -4,7 +4,7 @@ describe('Interpolator', () => {
   it('should initalize', () => {
     const interpolator = new Interpolator();
     expect(interpolator).toBeInstanceOf(Interpolator);
-    expect(interpolator.delimiter()).toEqual(expect.arrayContaining(['{','}']));
+    expect(interpolator.delimiter).toEqual(expect.arrayContaining(['{','}']));
   });
 
   it('should initalize with options', () => {
@@ -14,7 +14,7 @@ describe('Interpolator', () => {
     const interpolator = new Interpolator(options);
     expect(interpolator).toBeInstanceOf(Interpolator);
     expect(interpolator.options).toBe(options);
-    expect(interpolator.delimiter()).toEqual(expect.arrayContaining(['[[',']]']));
+    expect(interpolator.delimiter).toEqual(expect.arrayContaining(['[[',']]']));
   });
 });
 
@@ -91,4 +91,10 @@ describe('Parser', () => {
     const expected = 'Hi, my name is Dan.';
     expect(interpolated).toBe(expected);
   });
+
+  it('should return itself if nothing is provided', () => {
+    const str = 'Hello world';
+    const interpolated = interpolator.parse(str);
+    expect(interpolated).toBe(str);
+  })
 });
