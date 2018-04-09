@@ -52,14 +52,12 @@ Modifiers are functions that transform interpolated text. These are applied by r
 const Interpolator = require('string-interpolator');
 
 const replaceThis = `Hi, my name is {name|uppercase}.`;
-const options = {
-    data: {
-        name: 'Dan',
-    },
+const data = {
+    name: 'Dan',
 };
-const interpolator = new Interpolator(options);
+const interpolator = new Interpolator();
 
-interpolator.parse(replaceThis);
+interpolator.parse(replaceThis, data);
 // Hi, my name is DAN.
 ```
 
@@ -70,14 +68,12 @@ const Interpolator = require('string-interpolator');
 
 // This will transform to title case, and then lowercase
 const replaceThis = `Hi, my name is {name|title,lowercase}.`;
-const options = {
-    data: {
+const data = {
         name: 'Dan',
-    },
 };
-const interpolator = new Interpolator(options);
+const interpolator = new Interpolator();
 
-interpolator.parse(replaceThis);
+interpolator.parse(replaceThis, data);
 // Hi, my name is dan.
 ```
 
@@ -98,15 +94,13 @@ You can also build your own modifiers. Modifiers are functions that receives int
 const Interpolator = require('string-interpolator');
 
 const replaceThis = `Hi, my name is {name|customModifier}.`;
-const options = {
-    data: {
+const data = {
         name: 'Dan',
-    },
 };
-const interpolator = new Interpolator(options);
+const interpolator = new Interpolator();
 const customModifier = str => str.split('').reverse().join('');
 interpolator.registerModifier('customModifier', modifier)
 
-interpolator.parse(replaceThis);
+interpolator.parse(replaceThis, data);
 // Hi, my name is naD.
 ```
