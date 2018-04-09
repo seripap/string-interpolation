@@ -116,12 +116,16 @@ class Interpolator {
   applyRule(str, rule, data = {}) {
     const dataToReplace = this.applyData(rule.key, data);
     if (dataToReplace) {
-      return str.replace(rule.replace, this.applyModifiers(rule.modifiers, dataToReplace));
+      return str.replace(rule.replace, this.applyModifiers(rule.modifiers, dataToReplace, data));
     } else if (rule.alternativeText) {
-      return str.replace(rule.replace, this.applyModifiers(rule.modifiers, rule.alternativeText));
+      return str.replace(rule.replace, this.applyModifiers(rule.modifiers, rule.alternativeText, data));
     }
 
-    return str.replace(rule.replace, '');
+    const defaultModifier = this.applyModifiers(rule.modifiers, rule.key, data);
+    if (defaultModifier === rule.key) {
+      return str.replace(rule.replace, '');
+    }
+    return str.replace(rule.replace, defaultModifier);
   }
 
   getFromAlias(key) {
@@ -143,10 +147,10 @@ class Interpolator {
     return this.modifiers.find(modifier => modifier.key === key);
   }
 
-  applyModifiers(modifiers, str) {
+  applyModifiers(modifiers, str, rawData) {
     try {
-      const transformers = modifiers.map(modifier => modifier.transform);
-      return transformers.reduce((str, transform) => transform(str), str);
+      const transformers = modifiers.map(modifier => modifier && modifier.transform);
+      return transformers.reduce((str, transform) => transform ? transform(str, rawData) : str, str);
     } catch (e) {
       return str;
     }

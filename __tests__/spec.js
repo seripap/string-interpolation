@@ -162,4 +162,39 @@ describe('Parser', () => {
     const interpolatedAgain = interpolator.parse(replaceThis, data);
     expect(interpolatedAgain).toBe(' is great!');
   });
+
+  it('modifiers should have access to raw data', () => {
+    const replaceThis = `2015 World Series Winner: {2015|year2015}`;
+    const worldSeriesWinner = {
+      winners: [{
+        year: 2015,
+        team: 'Royals'
+      },
+      {
+        year: 2016,
+        team: 'Cubs'
+      },
+      {
+        year: 2017,
+        team: 'Astros'
+      }]
+    };
+
+    // val will be`2015`, data will be worldSeriesWinner
+    const advanceCustomModifier = (val, data) => {
+        try {
+          // val is always a string, which is why parseInt is neccessary if referencing a number
+          const winner = data.winners.find(winner => winner.year === parseInt(val));
+          return winner.team;
+        } catch (e) {
+          console.log(e);
+          return val;
+        }
+    }
+
+    interpolator.registerModifier('year2015', advanceCustomModifier);
+
+    const interpolated = interpolator.parse(replaceThis, worldSeriesWinner);
+    // Output: 2015 World Series Winner: Royals
+  });
 });

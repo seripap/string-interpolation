@@ -104,13 +104,13 @@ You can also build your own modifiers. Modifiers are functions that receives int
 - `key`: Unique key that annotates the modifier
 - `modifier`: Function to execute when reducing string
 
-A single parameter can be passed into your custom modifier. This parameter is what is interpolated from the pasrser.
+You can reference the interpolated value and data passed while parsing.
 
 ```js
 const customModifier = (val) => val.split('').reverse().join('');
 ```
 
-#### Example
+#### Simple Example
 
 ```js
 const Interpolator = require('string-interpolator');
@@ -125,10 +125,52 @@ const data = {
 const customModifier = str => str.split('').reverse().join('');
 
 // Register modifier with interpolation service with the name "customModifier" This is actually parsed internally as `custommodifier`, but to keep it pretty, you should consider using camel cases.
-interpolator.registerModifier('customModifier', modifier);
+interpolator.registerModifier('customModifier', customModifier);
 
 interpolator.parse(replaceThis, data);
 // Output: Hi, my name is naD.
+```
+
+#### Advance Example
+
+Assuming you do not want to make data alias to the referenced data point (see below), you can parse the raw data from the modifier itself. Be sure to try/catch.
+
+```js
+const Interpolator = require('string-interpolator');
+const interpolator = new Interpolator();
+
+const replaceThis = `2015 World Series Winner: {2015|year2015}`;
+const worldSeriesWinner = {
+  winners: [{
+    year: 2015,
+    team: 'Royals'
+  },
+  {
+    year: 2016,
+    team: 'Cubs'
+  },
+  {
+    year: 2017,
+    team: 'Astros'
+  }]
+};
+
+// val will be`2015`, data will be worldSeriesWinner
+const advanceCustomModifier = (val, data) => {
+    try {
+      // val is always a string, which is why parseInt is neccessary if referencing a number
+      const winner = data.winners.find(winner => winner.year === parseInt(val));
+      return winner.team;
+    } catch (e) {
+      console.log(e);
+      return val;
+    }
+}
+
+interpolator.registerModifier('year2015', advanceCustomModifier);
+
+const interpolated = interpolator.parse(replaceThis, worldSeriesWinner);
+// Output: 2015 World Series Winner: Royals
 ```
 
 ### Data Alias
