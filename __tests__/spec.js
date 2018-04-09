@@ -96,5 +96,70 @@ describe('Parser', () => {
     const str = 'Hello world';
     const interpolated = interpolator.parse(str);
     expect(interpolated).toBe(str);
-  })
+  });
+
+  it('should parse undefined data that has no alternative text', () => {
+    const str = `Hi my name is {name|uppercase}`;
+    const data = {
+      notName: 'dan',
+    }
+    const interpolated = interpolator.parse(str, data);
+    const expected = 'Hi my name is ';
+    expect(interpolated).toMatch(expected);
+  });
+
+  it('should add data aliases', () => {
+    const originalReplace = `{name.first} {name.last} is from {locations[0]} {locations[1]}`;
+    const replaceThis = `{firstName} {lastName} is from {city} {state}`;
+    const data = {
+        name: {
+          first: 'Dan',
+          last: 'Seripap',
+        },
+        locations: ['New York','NY'],
+    }
+
+    const aliases = [{
+        key: 'firstName',
+        ref: 'name.first'
+    },
+    {
+        key: 'lastName',
+        ref: 'name.last'
+    },
+    {
+        key: 'city',
+        ref: 'locations[0]'
+    },
+    {
+        key: 'state',
+        ref: 'locations[1]'
+    }];
+
+    // Add aliaseses to interpolator4
+    aliases.forEach(alias => interpolator.addAlias(alias.key, alias.ref));
+    
+    const originalInterpolated = interpolator.parse(originalReplace, data);
+    const interpolated = interpolator.parse(replaceThis, data);
+    const expected = 'Dan Seripap is from New York NY';
+    expect(originalInterpolated).toMatch(expected);
+    expect(interpolated).toMatch(expected);
+  });
+
+  it('should remove data aliases', () => {
+    const replaceThis = `{city} is great!`;
+    const data = {
+      location: {
+        city: 'New York'
+      },
+    }
+    interpolator.addAlias('city', 'location.city');
+    const interpolated = interpolator.parse(replaceThis, data);
+    const expected = 'New York is great!';
+    expect(interpolated).toBe(expected);
+
+    interpolator.removeAlias('city');
+    const interpolatedAgain = interpolator.parse(replaceThis, data);
+    expect(interpolatedAgain).toBe(' is great!');
+  });
 });

@@ -1,11 +1,12 @@
 const defaultOptions = require('./statics/DefaultOptions.js');
+const getValueFromObject = require('./lib/getValueFromObject.js');
 const defaultModifiers = require('./modifiers');
 
 class Interpolator {
   constructor(options = defaultOptions) {
     this.options = options;
-    this.reserved = [':','|']
     this.modifiers = [];
+    this.aliases = [];
     this.registerBuiltInModifiers();
   }
 
@@ -117,11 +118,11 @@ class Interpolator {
   }
 
   parseFromRules(str, data, rules) {
-    return rules.reduce((opts, rule) => this.applyRule(opts.str, rule, opts.data), { str, data });
+    return rules.reduce((reducedStr, rule) => this.applyRule(reducedStr, rule, data), str);
   }
 
-  applyRule(str, rule, data) {
-    const dataToReplace = data[rule.key];
+  applyRule(str, rule, data = {}) {
+    const dataToReplace = this.applyData(rule.key, data);
     if (dataToReplace) {
       return str.replace(rule.replace, this.applyModifiers(rule.modifiers, dataToReplace));
     } else if (rule.alternativeText) {
@@ -129,6 +130,21 @@ class Interpolator {
     }
 
     return str.replace(rule.replace, '');
+  }
+
+  getFromAlias(key) {
+    return this.aliases.find(alias => alias.key === key);
+  }
+
+  applyData(key, data) {
+    const alias = this.getFromAlias(key);
+    if (alias) {
+      const value = getValueFromObject(alias.ref, data);
+      if (value) {
+        return value;
+      }
+    }
+    return (key.indexOf('.') > 0 || key.indexOf('[') > 0) ? getValueFromObject(key, data) : data[key];
   }
 
   getModifier(key) {
@@ -142,6 +158,16 @@ class Interpolator {
     } catch (e) {
       return str;
     }
+  }
+
+  addAlias(key, ref) {
+    this.aliases.push({ key, ref });
+    return this;
+  }
+
+  removeAlias(key) {
+    this.aliases = this.aliases.filter(alias => alias.key !== key);
+    return this;
   }
 }
 
