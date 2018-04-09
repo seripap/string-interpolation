@@ -93,6 +93,8 @@ interpolator.parse(replaceThis, data);
 | uppercase | Converts to uppercase |
 | lowercase | Converts to lowercase |
 
+**All modifiers, whether custom or prebuilt are not case sensitive**. You can name a modifier whatever you'd like but it will all get parsed as lowercased text values.
+
 ### Custom modifiers
 
 You can also build your own modifiers. Modifiers are functions that receives interpolated strings and transforms them.
@@ -122,7 +124,7 @@ const data = {
 // `str` in this case will be "Dan"
 const customModifier = str => str.split('').reverse().join('');
 
-// Register modifier with interpolation service with the name "customModifier"
+// Register modifier with interpolation service with the name "customModifier" This is actually parsed internally as `custommodifier`, but to keep it pretty, you should consider using camel cases.
 interpolator.registerModifier('customModifier', modifier);
 
 interpolator.parse(replaceThis, data);

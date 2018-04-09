@@ -36,7 +36,7 @@ class Interpolator {
       return new Error('Modifiers must have a transformer. Transformers must be a function that returns a value.');
     }
 
-    this.modifiers.push({key, transform});
+    this.modifiers.push({key: key.toLowerCase(), transform});
     return this;
   }
 
@@ -63,16 +63,8 @@ class Interpolator {
   }
 
   getKeyFromMatch(match) {
-    let mutableMatch = match;
-    if (mutableMatch.indexOf(':') > 0) {
-      mutableMatch = this.removeAfter(mutableMatch, ':');
-    }
-
-    if (mutableMatch.indexOf('|') > 0) {
-      mutableMatch = this.removeAfter(mutableMatch, '|')
-    }
-
-    return this.removeDelimiter(mutableMatch);
+    const removeReservedSymbols = [':', '|'];
+    return this.removeDelimiter(removeReservedSymbols.reduce((val, sym) => val.indexOf(sym) > 0 ? this.removeAfter(val, sym) : val, match));
   }
 
   removeDelimiter(val) {
@@ -102,7 +94,7 @@ class Interpolator {
   getModifiers(str) {
     if (str.indexOf('|') > 0) {
       const strModifiers = this.removeDelimiter(this.extractAfter(str, '|')).split(',');
-      return strModifiers.map(modifier => this.getModifier(modifier));
+      return strModifiers.map(modifier => this.getModifier(modifier.toLowerCase()));
     }
 
     return [];
