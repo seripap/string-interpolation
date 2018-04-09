@@ -1,0 +1,31 @@
+{
+  "name": "string-interpolation",
+  "version": "1.0.0",
+  "description": "Dynamic string manipulation",
+  "main": "src/index.js",
+  "dependencies": {
+    "jest": "^22.4.3",
+    "npm": "^5.8.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "jest --coverage",
+    "test:dev": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seripap/string-interpolation.git"
+  },
+  "keywords": [
+    "dynamic",
+    "text",
+    "string",
+    "interpolation"
+  ],
+  "author": "Daniel Seripap <daniel@seripap.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/seripap/string-interpolation/issues"
+  },
+  "homepage": "https://github.com/seripap/string-interpolation#readme"
+}
