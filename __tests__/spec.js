@@ -81,4 +81,14 @@ describe('Parser', () => {
     const expected = 'Hi, my name is naD.';
     expect(interpolated).toBe(expected);
   });
+
+  it('should gracefullt fail undefined modifiers', () => {
+    const replaceThis = `Hi, my name is {name|undefinedModifier}.`;
+    const data = {
+      name: 'Dan',
+    };
+    const interpolated = interpolator.parse(replaceThis, data);
+    const expected = 'Hi, my name is Dan.';
+    expect(interpolated).toBe(expected);
+  });
 });

@@ -137,11 +137,12 @@ class Interpolator {
   }
 
   applyModifiers(modifiers, str) {
-    if (modifiers.length > 0) {
+    try {
       const transformers = modifiers.map(modifier => modifier.transform);
       return transformers.reduce((str, transform) => transform(str), str);
+    } catch (e) {
+      return str;
     }
-    return str;
   }
 }
 
