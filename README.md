@@ -19,7 +19,7 @@ const interpolator = new Interpolator(options);
 
 const replaceThis = `Welcome back, {username}!`;
 const data = {
-    usernamename: 'Dan',
+    username: 'Dan',
 };
 interpolator.parse(replaceThis, data);
 // Welcome back, Dan!
