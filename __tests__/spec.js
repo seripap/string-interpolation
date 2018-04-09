@@ -68,4 +68,17 @@ describe('Parser', () => {
     const expected = 'Hi my name is ALTERNATIVE';
     expect(interpolated).toBe(expected);
   });
+
+  it('should register and execute custom modifiers successfully', () => {
+    const replaceThis = `Hi, my name is {name|customModifier}.`;
+    const data = {
+      name: 'Dan',
+    };
+    const customModifier = str => str.split('').reverse().join('');
+    interpolator.registerModifier('customModifier', customModifier)
+
+    const interpolated = interpolator.parse(replaceThis, data);
+    const expected = 'Hi, my name is naD.';
+    expect(interpolated).toBe(expected);
+  });
 });

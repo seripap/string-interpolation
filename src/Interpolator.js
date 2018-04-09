@@ -21,21 +21,21 @@ class Interpolator {
     return this.options.delimiter[1];
   }
 
-  registerModifier(modifier = {}) {
-    if (!modifier.key) {
+  registerModifier(key, transform) {
+    if (!key) {
       return new Error('Modifiers must have a key');
     }
-
-    if (!modifier.transform && typeof modifier.transform !== 'Function') {
+    
+    if (typeof transform !== 'function') {
       return new Error('Modifiers must have a transformer. Transformers must be a function that returns a value.');
     }
 
-    this.modifiers.push(modifier);
+    this.modifiers.push({key, transform});
     return this;
   }
 
   init() {
-    defaultModifiers.forEach(modifier => this.registerModifier(modifier));
+    defaultModifiers.forEach(modifier => this.registerModifier(modifier.key, modifier.transform));
   }
 
   parseRules(str) {
@@ -122,20 +122,14 @@ class Interpolator {
   }
 
   applyRule(str, rule, data) {
-    try {
-      let newStr = str;
-      const dataToReplace = data[rule.key];
-      if (dataToReplace) {
-        return str.replace(rule.replace, this.applyModifiers(rule.modifiers, dataToReplace));
-      } else if (rule.alternativeText) {
-        return str.replace(rule.replace, this.applyModifiers(rule.modifiers, rule.alternativeText));
-      }
-
-      return str.replace(rule.replace, '');
-    } catch (e) {
-      console.warn(e);
-      return str;
+    const dataToReplace = data[rule.key];
+    if (dataToReplace) {
+      return str.replace(rule.replace, this.applyModifiers(rule.modifiers, dataToReplace));
+    } else if (rule.alternativeText) {
+      return str.replace(rule.replace, this.applyModifiers(rule.modifiers, rule.alternativeText));
     }
+
+    return str.replace(rule.replace, '');
   }
 
   getModifier(key) {
