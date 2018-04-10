@@ -12,16 +12,20 @@ function getArrayKeyIndex(val) {
 }
 
 module.exports = (value, data) => {
-  const valuesToPull = value.split('.');
-  while (valuesToPull.length) {
-    const testValue = getArrayKeyIndex(valuesToPull.shift());
-    if (typeof testValue === 'object') {
-      if (testValue.index && testValue.key) {
-        data = data[testValue.key][testValue.index];
+  try {
+    const valuesToPull = value.split('.');
+    while (valuesToPull.length) {
+      const testValue = getArrayKeyIndex(valuesToPull.shift());
+      if (typeof testValue === 'object') {
+        if (testValue.index && testValue.key) {
+          data = data[testValue.key][testValue.index];
+        }
+      } else {
+        data = data[testValue];
       }
-    } else {
-      data = data[testValue];
     }
+    return data;
+  } catch (e) {
+    return '';
   }
-  return data;
 }
