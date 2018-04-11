@@ -146,6 +146,41 @@ describe('Parser', () => {
     expect(interpolated).toMatch(expected);
   });
 
+  it('should ignore case from interpolated values from data aliasing', () => {
+    const replaceThis = `{FIRSTNAME} {LASTNAME} is from {CiTy} {STaTe}`;
+    const data = {
+        name: {
+          first: 'Dan',
+          last: 'Seripap',
+        },
+        locations: ['New York','NY'],
+    }
+
+    const aliases = [{
+        key: 'firstName',
+        ref: 'name.first'
+    },
+    {
+        key: 'LaSTNaME',
+        ref: 'name.last'
+    },
+    {
+        key: 'CITY',
+        ref: 'locations[0]'
+    },
+    {
+        key: 'state',
+        ref: 'locations[1]'
+    }];
+
+    // Add aliaseses to interpolator4
+    aliases.forEach(alias => interpolator.addAlias(alias.key, alias.ref));
+    
+    const interpolated = interpolator.parse(replaceThis, data);
+    const expected = 'Dan Seripap is from New York NY';
+    expect(interpolated).toMatch(expected);
+  });
+  
   it('should remove data aliases', () => {
     const replaceThis = `{city} is great!`;
     const data = {

@@ -129,7 +129,7 @@ class Interpolator {
   }
 
   getFromAlias(key) {
-    return this.aliases.find(alias => alias.key === key);
+    return this.aliases.find(alias => alias.key.toLowerCase() === key.toLowerCase());
   }
 
   applyData(key, data) {
