@@ -108,6 +108,14 @@ describe('Parser', () => {
     expect(interpolated).toMatch(expected);
   });
 
+  it('should support data aliases references from helper function', () => {
+    const testRef = () => 'test city data';
+    const testKey = 'city';
+
+    const test = interpolator.addAlias(testKey, testRef);
+    expect(test.aliases[0].ref).toBe('test city data');
+  });
+
   it('should add data aliases', () => {
     const originalReplace = `{name.first} {name.last} is from {locations[0]} {locations[1]}`;
     const replaceThis = `{firstName} {lastName} is from {city} {state}`;
