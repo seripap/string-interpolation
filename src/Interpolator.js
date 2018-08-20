@@ -158,9 +158,10 @@ class Interpolator {
 
   addAlias(key, ref) {
     if (typeof ref === 'function'){
-      this.aliases.push({ key, ref() });
+      this.aliases.push({key, ref: ref() });
+    } else {
+      this.aliases.push({ key, ref });
     }
-    this.aliases.push({ key, ref });
     return this;
   }
 
